@@ -41,7 +41,7 @@ website/
 
 推送到 `main` 且改动涉及 `website/`、`package.json` 或部署工作流时，GitHub Actions（`.github/workflows/deploy-website.yml`）自动构建并发布到 GitHub Pages。
 
-首次发布前需要完成两项一次性设置：
+首次发布前需要完成三项一次性设置：
 
 1. **GitHub Pages 来源**：仓库 Settings → Pages → Build and deployment → Source 选 **GitHub Actions**。
 2. **域名解析**：在 `hifane.com` 的 DNS 服务商处添加一条记录：
@@ -50,7 +50,9 @@ website/
    |---|---|---|
    | CNAME | `oryxos` | `hefrankeleyn.github.io` |
 
-   解析生效后，在 Settings → Pages → Custom domain 确认显示 `oryxos.hifane.com`，并勾选 **Enforce HTTPS**（证书签发可能需要几分钟到一小时）。
+3. **绑定自定义域名**：Settings → Pages → Custom domain 填入 `oryxos.hifane.com` 并点 **Save**，等 DNS 检查通过后勾选 **Enforce HTTPS**（证书签发可能需要几分钟到一小时）。
+
+   > 注意：使用 GitHub Actions 发布时，GitHub **不会读取**构建产物里的 `public/CNAME`，域名必须在这里手动填写一次。`CNAME` 文件保留着，作为域名的记录。
 
 ## 评论与统计
 
