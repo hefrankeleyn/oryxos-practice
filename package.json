@@ -1,0 +1,21 @@
+{
+  "name": "oryxos-website",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OryxOS 项目主页（VitePress）",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev website",
+    "docs:build": "vitepress build website",
+    "docs:preview": "vitepress preview website"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hefrankeleyn/oryxos-practice.git"
+  },
+  "homepage": "https://oryxos.hifane.com",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
