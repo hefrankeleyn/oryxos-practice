@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    CLI 独立运行时的日志配置（由 OryxOsCliLauncher 通过 logback.configurationFile 显式指定）。
+    文件名刻意不叫 logback.xml：避免被 oryxos-boot 的 Spring Boot 日志系统自动加载。
+
+    - 日志统一输出到 stderr，保证 stdout 只包含命令结果，方便脚本解析；
+    - 默认级别 WARN，可用 -Doryxos.log.level=DEBUG 打开详细日志。
+-->
+<configuration>
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="${oryxos.log.level:-WARN}">
+        <appender-ref ref="STDERR"/>
+    </root>
+</configuration>

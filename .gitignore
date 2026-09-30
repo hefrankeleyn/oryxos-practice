@@ -1,2 +1,19 @@
 .DS_Store
 
+# Maven
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OryxOS 本地工作区与运行产物
+.oryxos/
+*.db
+logs/
+
+# Website（VitePress）
+node_modules/
+website/.vitepress/dist/
+website/.vitepress/cache/

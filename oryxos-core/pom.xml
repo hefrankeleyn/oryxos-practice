@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.oryxlabs</groupId>
+        <artifactId>oryxos-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oryxos-core</artifactId>
+    <name>OryxOS Core</name>
+    <!-- 核心抽象与引擎：OryxTool、Profile、Session、ReActLoop、PromptBuilder、ToolExecutor、AgentService、AgentLoader、ContextLoader、AgentScheduler -->
+    <description>核心抽象与引擎：OryxTool、Profile、Session、ReActLoop、PromptBuilder、ToolExecutor、AgentService、AgentLoader、ContextLoader、AgentScheduler</description>
+
+    <dependencies>
+        <!-- Spring IoC：引擎组件以 Bean 形式装配、AgentScheduler 使用 ThreadPoolTaskScheduler -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <!-- JSON：Tool 输入输出、Session 消息序列化 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!-- YAML：解析 AGENT.md frontmatter、mcp_servers.yaml -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <!-- 日志门面 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+</project>

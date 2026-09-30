@@ -1,0 +1,27 @@
+# OryxOS 默认配置
+oryxos:
+  # 工作区根目录（可通过 -Doryxos.home=/path 覆盖）
+  home: .oryxos
+
+spring:
+  application:
+    name: oryxos
+  main:
+    banner-mode: off
+  threads:
+    virtual:
+      # Java 21 virtual thread：同步阻塞模型下支撑高并发
+      enabled: true
+  datasource:
+    # SQLite 嵌入式数据库，落在工作区目录下
+    url: jdbc:sqlite:${oryxos.home}/oryxos.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    open-in-view: false
+    hibernate:
+      # 表结构由手工维护的建表脚本管理，不依赖 Hibernate 自动演进
+      ddl-auto: none
+
+server:
+  port: 8080

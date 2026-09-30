@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.oryxlabs</groupId>
+        <artifactId>oryxos-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oryxos-boot</artifactId>
+    <name>OryxOS Boot</name>
+    <!-- Spring Boot 启动模块：主类、自动配置、依赖聚合，产出单个可执行 JAR -->
+    <description>Spring Boot 启动模块：主类、自动配置、依赖聚合，产出单个可执行 JAR</description>
+
+    <dependencies>
+        <!-- 聚合全部功能模块 -->
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-memory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-tool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-channel-cli</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-storage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-cli</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- 最终产物：oryxos-boot/target/oryxos.jar（可执行 fat JAR） -->
+        <finalName>oryxos</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.oryxlabs.oryxos.OryxOsApplication</mainClass>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <!-- repackage 目标已由 spring-boot-starter-parent 绑定，这里无需重复声明 -->
+            </plugin>
+        </plugins>
+    </build>
+</project>

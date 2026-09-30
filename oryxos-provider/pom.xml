@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.oryxlabs</groupId>
+        <artifactId>oryxos-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oryxos-provider</artifactId>
+    <name>OryxOS Provider</name>
+    <!-- 核心能力一：LLM Provider 抽象，provider name 到 ChatModel 显式映射 -->
+    <description>核心能力一：LLM Provider 抽象，provider name 到 ChatModel 显式映射</description>
+
+    <dependencies>
+        <!-- 核心抽象：OryxTool、Profile、Session 等 -->
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-core</artifactId>
+        </dependency>
+        <!-- Spring AI 模型抽象（ChatModel、@Tool 注解与 schema 生成）；不引入自动配置 starter -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-model</artifactId>
+        </dependency>
+    </dependencies>
+</project>

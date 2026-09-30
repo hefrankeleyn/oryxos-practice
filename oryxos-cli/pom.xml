@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.oryxlabs</groupId>
+        <artifactId>oryxos-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oryxos-cli</artifactId>
+    <name>OryxOS CLI</name>
+    <!-- 命令行入口：Picocli 12 个子命令、ConfigLoader（配置与密钥加载） -->
+    <description>命令行入口：Picocli 12 个子命令、ConfigLoader（配置与密钥加载）</description>
+
+    <dependencies>
+        <!-- 核心抽象：OryxTool、Profile、Session 等 -->
+        <dependency>
+            <groupId>com.oryxlabs</groupId>
+            <artifactId>oryxos-core</artifactId>
+        </dependency>
+        <!-- 命令行解析 -->
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+        </dependency>
+        <!-- SLF4J 实现：CLI 独立运行时由 oryxos-cli-logback.xml 配置（默认只输出 WARN 及以上到 stderr） -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <!-- 版本信息文件需要 Maven 过滤，注入 @project.version@ 等构建属性 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>oryxos-version.properties</include>
+                </includes>
+            </resource>
+            <!-- 其余资源原样拷贝（logback 配置中的 ${...} 不能被 Maven 替换） -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>oryxos-version.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <!--
+                额外产出一个可独立运行的 fat JAR：target/oryxos-cli-<version>-exec.jar。
+                使用 classifier，主产物 oryxos-cli-<version>.jar 保持普通 JAR，供 oryxos-boot 依赖。
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.oryxlabs.oryxos.cli.OryxOsCliLauncher</mainClass>
+                    <classifier>exec</classifier>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
