@@ -417,8 +417,6 @@ oryxos serve</code></pre>
     <!-- ── FOOTER ── -->
     <footer class="oryx-footer">
       <span>{{ t('基于 Apache 2.0 协议开源', 'Released under the Apache 2.0 License') }}</span>
-      <span class="oryx-footer-sep">·</span>
-      <span>{{ t('由 oryx-labs 社区用 AI coding 构建', 'Built with AI coding by the oryx-labs community') }}</span>
     </footer>
 
   </div>
@@ -796,7 +794,6 @@ oryxos serve</code></pre>
   color: #94a3b8;
   border-top: 1px solid #e5e7eb;
 }
-.oryx-footer-sep { margin: 0 8px; }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {

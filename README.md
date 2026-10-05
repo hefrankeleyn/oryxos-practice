@@ -301,6 +301,6 @@ OryxOS 是 [oryx-labs](docs/05-oryx-labs.md) 社区的项目。oryx-labs 是一�
 
 长期目标：走进 Apache 基金会，成为 Apache 顶级项目。
 
-Made with ❤️ by oryx-labs
+Made with ❤️ by hefrankeleyn
 
 </div>
