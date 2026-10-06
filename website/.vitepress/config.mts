@@ -4,8 +4,8 @@ import { la51, la51Enabled } from './integrations'
 const SITE_URL = 'https://oryxos.hifane.com'
 const REPO_URL = 'https://github.com/hefrankeleyn/oryxos-practice'
 
-const DESC_ZH = 'OryxOS 是 Java 原生的企业级 Agent 操作系统：一个目录定义一个 Agent，一个底座运行一群 Agent，私有部署，数据不出域。'
-const DESC_EN = 'OryxOS is a Java-native Agent Harness OS for the enterprise: one directory defines an Agent, one runtime hosts them all — self-hosted, data stays in-house.'
+const DESC_ZH = '给 Agent 一个可掌控的运行环境。OryxOS 是 Java 原生的 Agent Harness OS：一个目录定义一个 Agent，一个底座提供共享执行环境。当前处于 Runtime MVP 工程骨架阶段。'
+const DESC_EN = 'A home for your Agents, on your terms. OryxOS is a Java-native Agent Harness OS with file-based definitions and a shared runtime. Currently at the Runtime MVP engineering skeleton stage.'
 
 /** 51.la 统计脚本：仅在 integrations.ts 中配置了 ID 时注入。 */
 const analyticsHead: HeadConfig[] = la51Enabled
@@ -28,8 +28,8 @@ export default defineConfig({
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
-    ['meta', { name: 'theme-color', content: '#6D28D9' }],
-    ['meta', { name: 'author', content: 'oryx-labs' }],
+    ['meta', { name: 'theme-color', content: '#F4F5F2' }],
+    ['meta', { name: 'author', content: 'hefrankeleyn' }],
     ['meta', { name: 'keywords', content: 'OryxOS, Agent OS, Agent Harness, AI Agent, Java, Spring AI, Spring AI Alibaba, MCP, ReAct, 私有部署, 企业级 Agent' }],
     ['meta', { name: 'robots', content: 'index, follow' }],
     ['meta', { property: 'og:type', content: 'website' }],

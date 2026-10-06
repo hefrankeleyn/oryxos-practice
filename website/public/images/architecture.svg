@@ -1,159 +1,136 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC','Helvetica Neue',Arial,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040" role="img" aria-labelledby="title description">
+  <title id="title">OryxOS 目标逻辑架构 / Target logical architecture</title>
+  <desc id="description">CLI、REST API 和定时任务统一调用 AgentService。自实现 ReActLoop 组装文件与记忆上下文，调用显式映射的 Provider，必要时由 ToolExecutor 校验并执行工具，回填结果继续推理。每次模型和工具调用，包括失败与拒绝，都将审计写入 SQLite。图中业务组件尚未实现；这是目标调用关系，不是 Maven 依赖图。</desc>
   <defs>
-    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
-    </marker>
-    <marker id="arrExt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#D97706"/>
-    </marker>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="m1 1 6 3-6 3" fill="none" stroke="#8B7C9D" stroke-width="1.4"/></marker>
+    <marker id="memory-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="m1 1 6 3-6 3" fill="none" stroke="#7A9A87" stroke-width="1.4"/></marker>
     <style>
-      .t   { font-size: 15px; font-weight: 600; fill: #0F172A; }
-      .s   { font-size: 12px; fill: #475569; }
-      .tw  { font-size: 15px; font-weight: 600; fill: #FFFFFF; }
-      .sw  { font-size: 12px; fill: #CBD5E1; }
-      .lbl { font-size: 14px; font-weight: 700; }
-      .lbs { font-size: 11px; fill: #64748B; }
-      .ln    { stroke: #475569; stroke-width: 1.6; fill: none; }
-      .lnExt { stroke: #D97706; stroke-width: 1.6; fill: none; stroke-dasharray: 6 4; }
+      text { font-family: 'Avenir Next', 'Trebuchet MS', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #292536; }
+      .heading { font-size: 22px; font-weight: 600; }
+      .name { font-size: 20px; font-weight: 600; }
+      .body { font-size: 16px; fill: #625D6B; }
+      .small { font-size: 14px; fill: #6E617C; }
+      .mono { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 15px; fill: #65547C; }
+      .flow { fill: none; stroke: #8B7C9D; stroke-width: 1.7; stroke-linejoin: round; marker-end: url(#arrow); }
+      .outline { stroke: #D5CDDF; stroke-width: 1.2; }
     </style>
   </defs>
+  <rect width="1440" height="1040" fill="#FFFFFF"/>
+  <text x="48" y="57" font-size="32" font-weight="600" letter-spacing="-1">OryxOS</text>
+  <text x="218" y="55" class="heading">目标逻辑架构 / Target architecture</text>
+  <text x="48" y="87" class="body">一个目录定义一个 Agent；一个底座提供共享执行环境。</text>
+  <rect x="1094" y="30" width="298" height="44" rx="8" fill="#E4DFF1"/>
+  <text x="1243" y="57" text-anchor="middle" font-size="15" fill="#6650B8">Runtime MVP · In development</text>
 
-  <rect width="1200" height="920" fill="#FFFFFF"/>
+  <!-- 三个触发来源不建立三套执行链路 -->
+  <rect x="404" y="119" width="190" height="64" rx="9" fill="#F4F5F2" class="outline"/>
+  <rect x="614" y="119" width="190" height="64" rx="9" fill="#F4F5F2" class="outline"/>
+  <rect x="824" y="119" width="190" height="64" rx="9" fill="#F4F5F2" class="outline"/>
+  <text x="499" y="146" class="name" text-anchor="middle">CLI Channel</text>
+  <text x="499" y="168" class="small" text-anchor="middle">终端 / Terminal</text>
+  <text x="709" y="146" class="name" text-anchor="middle">REST API</text>
+  <text x="709" y="168" class="small" text-anchor="middle">业务系统 / Applications</text>
+  <text x="919" y="146" class="name" text-anchor="middle">AgentScheduler</text>
+  <text x="919" y="168" class="small" text-anchor="middle">定时任务 / Schedules</text>
+  <path d="M499 183v18h420v-18" fill="none" stroke="#8B7C9D" stroke-width="1.7"/>
 
-  <!-- ==================== 外部触发者 ==================== -->
-  <g text-anchor="middle">
-    <rect x="215" y="28" width="140" height="34" rx="17" fill="#F8FAFC" stroke="#94A3B8"/>
-    <text x="285" y="50" class="s">开发者 / 运维</text>
-    <rect x="475" y="28" width="140" height="34" rx="17" fill="#F8FAFC" stroke="#94A3B8"/>
-    <text x="545" y="50" class="s">业务系统</text>
-    <rect x="735" y="28" width="140" height="34" rx="17" fill="#F8FAFC" stroke="#94A3B8"/>
-    <text x="805" y="50" class="s">定时规则</text>
-  </g>
+  <!-- 文件工作区：Skill 与 Agent 定义属于上下文，不注册为 Tool -->
+  <rect x="48" y="214" width="288" height="540" rx="14" fill="#F0F6F2" stroke="#BCD1C4" stroke-width="1.2"/>
+  <text x="72" y="249" class="heading">Agent 工作区</text>
+  <text x="72" y="276" class="small">File-based definitions &amp; context</text>
+  <rect x="72" y="304" width="240" height="120" rx="8" fill="#FFFFFF" stroke="#CDDCD3"/>
+  <text x="92" y="336" class="name">AGENT.md</text>
+  <text x="92" y="364" class="body">frontmatter 派生 Profile</text>
+  <text x="92" y="389" class="body">正文定义任务与行为</text>
+  <text x="92" y="412" class="small">AgentLoader / ContextLoader</text>
+  <rect x="72" y="442" width="240" height="116" rx="8" fill="#FFFFFF" stroke="#CDDCD3"/>
+  <text x="92" y="474" class="name">skills/&lt;name&gt;</text>
+  <text x="92" y="501" class="body">名称、描述、读取路径</text>
+  <text x="92" y="526" class="body">正文由 read_file 按需读取</text>
+  <text x="92" y="548" class="small">Context, not a Tool</text>
+  <rect x="72" y="576" width="240" height="114" rx="8" fill="#FFFFFF" stroke="#CDDCD3"/>
+  <text x="92" y="608" class="name">Bootstrap / Config</text>
+  <text x="92" y="636" class="body">共享规则与运行配置</text>
+  <text x="92" y="661" class="body">凭证仅从环境注入</text>
+  <text x="92" y="683" class="mono">${ENV_VAR}</text>
+  <text x="72" y="726" class="small">任务写在文件中，运行机制在底座。</text>
 
-  <!-- ==================== OryxOS 进程边界 ==================== -->
-  <rect x="20" y="90" width="920" height="770" rx="16" fill="none" stroke="#0F172A" stroke-width="1.4" stroke-dasharray="8 5"/>
-  <rect x="34" y="81" width="178" height="18" fill="#FFFFFF"/>
-  <text x="123" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="#0F172A">OryxOS · 单进程 / 单 JAR</text>
+  <!-- 单机 JVM 逻辑边界；不是 core 的编译依赖 -->
+  <rect x="364" y="214" width="692" height="604" rx="14" fill="#FCFBFE" stroke="#BAAECF" stroke-width="1.3"/>
+  <text x="388" y="249" class="heading">单机运行时 / JVM runtime</text>
+  <text x="1032" y="249" class="small" text-anchor="end">同步执行 · Virtual threads</text>
+  <rect x="404" y="269" width="612" height="72" rx="9" fill="#292536"/>
+  <text x="428" y="300" font-size="20" font-weight="600" style="fill:#FFFFFF">AgentService</text>
+  <text x="428" y="323" font-size="14" style="fill:#CFC7DE">统一入口 / One entry point</text>
+  <text x="991" y="312" class="mono" text-anchor="end" style="fill:#E4DFF1">process(Session, message)</text>
+  <path d="M710 341v27" class="flow"/>
 
-  <!-- ==================== 接入层 ==================== -->
-  <rect x="35" y="110" width="890" height="90" rx="12" fill="#EFF6FF"/>
-  <text x="95" y="151" text-anchor="middle" class="lbl" fill="#1D4ED8">接入层</text>
-  <text x="95" y="170" text-anchor="middle" class="lbs">人推 + 钟推</text>
-  <g text-anchor="middle">
-    <rect x="180" y="125" width="210" height="60" rx="9" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.5"/>
-    <text x="285" y="151" class="t">CLI Channel</text>
-    <text x="285" y="172" class="s">oryxos chat</text>
-    <rect x="440" y="125" width="210" height="60" rx="9" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.5"/>
-    <text x="545" y="151" class="t">Web Service</text>
-    <text x="545" y="172" class="s">REST API · /api/v1</text>
-    <rect x="700" y="125" width="210" height="60" rx="9" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.5"/>
-    <text x="805" y="151" class="t">AgentScheduler</text>
-    <text x="805" y="172" class="s">cron 到点触发</text>
-  </g>
+  <rect x="388" y="368" width="644" height="356" rx="11" fill="#F2EEF8" stroke="#D6CCE6"/>
+  <text x="411" y="400" class="name">ReActLoop</text>
+  <text x="540" y="400" class="small">自实现循环 / Own the loop</text>
+  <text x="1005" y="400" class="small" text-anchor="end">SDK 不自动执行工具</text>
+  <rect x="411" y="429" width="249" height="80" rx="8" fill="#FFFFFF" class="outline"/>
+  <text x="431" y="461" class="name">PromptBuilder</text>
+  <text x="431" y="488" class="body">文件 + 记忆 + 历史 + 工具</text>
+  <rect x="745" y="429" width="260" height="80" rx="8" fill="#FFFFFF" class="outline"/>
+  <text x="765" y="461" class="name">ProviderService</text>
+  <text x="765" y="488" class="mono">provider name → ChatModel</text>
+  <path d="M660 469h85" class="flow"/>
+  <path d="M875 509v26H535v39" class="flow"/>
+  <text x="548" y="554" class="small">无工具请求 / Final answer</text>
+  <path d="M875 535v39" class="flow"/>
+  <text x="889" y="556" class="small">Tool call</text>
+  <rect x="411" y="574" width="249" height="107" rx="8" fill="#FFFFFF" class="outline"/>
+  <text x="431" y="608" class="name">最终响应 / Response</text>
+  <text x="431" y="638" class="body">输出结果或终止本轮</text>
+  <text x="431" y="663" class="small">受最大迭代次数约束</text>
+  <rect x="745" y="574" width="260" height="107" rx="8" fill="#E4DFF1" stroke="#BAAAD3"/>
+  <text x="765" y="608" class="name">ToolExecutor</text>
+  <text x="765" y="638" class="body">Registry → Sandbox → 执行</text>
+  <text x="765" y="663" class="small">统一 OryxTool · 失败也审计</text>
+  <path d="M875 681v23H700V488h-40" class="flow"/>
+  <text x="720" y="718" class="small">结果回填 / Next turn</text>
 
-  <!-- ==================== 统一入口 ==================== -->
-  <text x="95" y="279" text-anchor="middle" class="lbl" fill="#1E293B">统一入口</text>
-  <rect x="180" y="245" width="730" height="56" rx="10" fill="#1E293B"/>
-  <text x="545" y="269" text-anchor="middle" class="tw">AgentService</text>
-  <text x="545" y="290" text-anchor="middle" class="sw">process(Session, message) · 三个入口共用同一条链路</text>
+  <rect x="404" y="741" width="612" height="56" rx="8" fill="#FFFFFF" stroke="#BAAECF" stroke-dasharray="5 4"/>
+  <text x="428" y="765" class="name">调用审计 / Audit</text>
+  <text x="990" y="765" class="mono" text-anchor="end">llm_calls + tool_invocations</text>
+  <text x="428" y="786" class="small">每次调用，包括失败与拒绝 / Every call, including failures</text>
 
-  <!-- ==================== 引擎层 ==================== -->
-  <rect x="35" y="350" width="890" height="100" rx="12" fill="#F5F3FF"/>
-  <text x="95" y="396" text-anchor="middle" class="lbl" fill="#6D28D9">引擎层</text>
-  <text x="95" y="415" text-anchor="middle" class="lbs">Agent 的大脑</text>
-  <g text-anchor="middle">
-    <rect x="180" y="365" width="210" height="70" rx="9" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5"/>
-    <text x="285" y="395" class="t">PromptBuilder</text>
-    <text x="285" y="417" class="s">组装上下文与工具列表</text>
-    <rect x="440" y="365" width="210" height="70" rx="9" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2.4"/>
-    <text x="545" y="395" class="t">ReActLoop</text>
-    <text x="545" y="417" class="s">Reason → Act → Observe</text>
-    <rect x="700" y="365" width="210" height="70" rx="9" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5"/>
-    <text x="805" y="395" class="t">ToolExecutor</text>
-    <text x="805" y="417" class="s">沙箱校验 · 执行 · 审计</text>
-  </g>
+  <!-- 外部模型请求不被宣传成默认不出域；Sandbox 是工具动作边界 -->
+  <rect x="1084" y="214" width="308" height="604" rx="14" fill="#F7F7F4" stroke="#D7D5DE" stroke-dasharray="6 5"/>
+  <text x="1108" y="249" class="heading">外部资源 / Outside JVM</text>
+  <text x="1108" y="277" class="small">访问边界由实际配置决定</text>
+  <rect x="1105" y="404" width="264" height="114" rx="8" fill="#FFFFFF" class="outline"/>
+  <text x="1125" y="439" class="name">LLM Providers</text>
+  <text x="1125" y="467" class="body">云端模型 / 本地推理</text>
+  <text x="1125" y="493" class="small">Cloud requests leave the host</text>
+  <path d="M1005 469h100" class="flow" marker-start="url(#arrow)"/>
+  <rect x="1105" y="574" width="264" height="107" rx="8" fill="#FFFFFF" class="outline"/>
+  <text x="1125" y="608" class="name">MCP / Tools / Notify</text>
+  <text x="1125" y="638" class="body">外部服务、文件与命令</text>
+  <text x="1125" y="663" class="small">按工具动作校验白名单</text>
+  <path d="M1005 627h100" class="flow"/>
+  <text x="1108" y="736" class="small">应用层白名单 ≠ 强隔离沙箱</text>
+  <text x="1108" y="762" class="small">Allow-list ≠ untrusted-code isolation</text>
 
-  <!-- ==================== 能力层 ==================== -->
-  <rect x="35" y="500" width="890" height="110" rx="12" fill="#ECFDF5"/>
-  <text x="95" y="551" text-anchor="middle" class="lbl" fill="#047857">能力层</text>
-  <text x="95" y="570" text-anchor="middle" class="lbs">供养引擎</text>
-  <g text-anchor="middle">
-    <rect x="180" y="515" width="210" height="80" rx="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
-    <text x="285" y="549" class="t">Memory</text>
-    <text x="285" y="571" class="s">会话记忆 + MEMORY.md</text>
-    <rect x="440" y="515" width="210" height="80" rx="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
-    <text x="545" y="549" class="t">Provider</text>
-    <text x="545" y="571" class="s">name → ChatModel 显式映射</text>
-    <rect x="700" y="515" width="210" height="80" rx="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
-    <text x="805" y="549" class="t">Tool</text>
-    <text x="805" y="571" class="s">内置 · MCP · @Tool</text>
-  </g>
-
-  <!-- ==================== 基础层 ==================== -->
-  <rect x="35" y="660" width="890" height="180" rx="12" fill="#F1F5F9"/>
-  <text x="95" y="741" text-anchor="middle" class="lbl" fill="#334155">基础层</text>
-  <text x="95" y="760" text-anchor="middle" class="lbs">配置 · 存储</text>
-  <g text-anchor="middle">
-    <rect x="180" y="675" width="210" height="64" rx="9" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3"/>
-    <text x="285" y="703" class="t">AgentLoader</text>
-    <text x="285" y="724" class="s">AGENT.md → Profile</text>
-    <rect x="440" y="675" width="210" height="64" rx="9" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3"/>
-    <text x="545" y="703" class="t">ContextLoader</text>
-    <text x="545" y="724" class="s">Bootstrap · 正文 · Skill</text>
-    <rect x="700" y="675" width="210" height="64" rx="9" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3"/>
-    <text x="805" y="703" class="t">ConfigLoader</text>
-    <text x="805" y="724" class="s">环境变量密钥注入</text>
-    <rect x="180" y="760" width="470" height="64" rx="9" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3"/>
-    <text x="415" y="788" class="t">SQLite · oryxos.db</text>
-    <text x="415" y="809" class="s">会话 · 审计（llm_calls / tool_invocations）· 定时任务</text>
-    <rect x="700" y="760" width="210" height="64" rx="9" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3"/>
-    <text x="805" y="788" class="t">文件系统 · .oryxos/</text>
-    <text x="805" y="809" class="s">agents · skills · MEMORY.md</text>
-  </g>
-
-  <!-- ==================== 外部系统 ==================== -->
-  <text x="1080" y="476" text-anchor="middle" font-size="12.5" font-weight="700" fill="#B45309">外部系统</text>
-  <g text-anchor="middle">
-    <rect x="990" y="498" width="180" height="48" rx="9" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="6 4"/>
-    <text x="1080" y="518" class="t">MCP Servers</text>
-    <text x="1080" y="536" class="s">stdio · 任意语言</text>
-    <rect x="990" y="562" width="180" height="48" rx="9" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="6 4"/>
-    <text x="1080" y="582" class="t">企业 IM</text>
-    <text x="1080" y="600" class="s">Webhook 通知</text>
-    <rect x="990" y="675" width="180" height="64" rx="9" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.4" stroke-dasharray="6 4"/>
-    <text x="1080" y="703" class="t">LLM APIs</text>
-    <text x="1080" y="724" class="s">DeepSeek · Kimi · 通义</text>
-  </g>
-
-  <!-- ==================== 连线 ==================== -->
-  <!-- 触发者 → 接入层 -->
-  <line class="ln" x1="285" y1="62" x2="285" y2="123" marker-end="url(#arr)"/>
-  <line class="ln" x1="545" y1="62" x2="545" y2="123" marker-end="url(#arr)"/>
-  <line class="ln" x1="805" y1="62" x2="805" y2="123" marker-end="url(#arr)"/>
-  <!-- 接入层 → AgentService -->
-  <line class="ln" x1="285" y1="185" x2="285" y2="243" marker-end="url(#arr)"/>
-  <line class="ln" x1="545" y1="185" x2="545" y2="243" marker-end="url(#arr)"/>
-  <line class="ln" x1="805" y1="185" x2="805" y2="243" marker-end="url(#arr)"/>
-  <!-- AgentService → ReActLoop -->
-  <line class="ln" x1="545" y1="301" x2="545" y2="363" marker-end="url(#arr)"/>
-  <!-- 引擎内部 -->
-  <line class="ln" x1="440" y1="400" x2="392" y2="400" marker-end="url(#arr)"/>
-  <line class="ln" x1="650" y1="400" x2="698" y2="400" marker-end="url(#arr)"/>
-  <!-- 能力层 ↔ 引擎层 -->
-  <line class="ln" x1="285" y1="515" x2="285" y2="437" marker-end="url(#arr)"/>
-  <line class="ln" x1="545" y1="437" x2="545" y2="513" marker-start="url(#arr)" marker-end="url(#arr)"/>
-  <line class="ln" x1="805" y1="437" x2="805" y2="513" marker-start="url(#arr)" marker-end="url(#arr)"/>
-  <!-- 能力层 → 外部系统 -->
-  <line class="lnExt" x1="910" y1="522" x2="988" y2="522" marker-end="url(#arrExt)"/>
-  <line class="lnExt" x1="910" y1="586" x2="988" y2="586" marker-end="url(#arrExt)"/>
-  <path class="lnExt" d="M545,595 L545,635 L1080,635 L1080,673" marker-end="url(#arrExt)"/>
-
-  <!-- ==================== 图例 ==================== -->
-  <g font-size="12" fill="#475569">
-    <line class="ln" x1="40" y1="890" x2="76" y2="890" marker-end="url(#arr)"/>
-    <text x="86" y="894">进程内调用</text>
-    <line class="lnExt" x1="190" y1="890" x2="226" y2="890" marker-end="url(#arrExt)"/>
-    <text x="236" y="894">跨越应用边界（经沙箱校验）</text>
-    <text x="1170" y="894" text-anchor="end" fill="#94A3B8">所有 LLM 调用与 Tool 调用均落库审计</text>
-  </g>
+  <!-- 记忆门面和持久化，均属于核心阶段目标 -->
+  <rect x="48" y="854" width="440" height="118" rx="10" fill="#F0F6F2" stroke="#BCD1C4"/>
+  <text x="72" y="887" class="name">MemoryService</text>
+  <text x="72" y="917" class="body">SessionManager → SQLite</text>
+  <text x="72" y="944" class="body">MarkdownMemoryStore → MEMORY.md</text>
+  <path d="M268 854v-27h84V491h59" fill="none" stroke="#7A9A87" stroke-width="1.7" marker-end="url(#memory-arrow)"/>
+  <rect x="526" y="854" width="530" height="118" rx="10" fill="#F7F5FA" class="outline"/>
+  <text x="550" y="887" class="name">SQLite / 持久化</text>
+  <text x="550" y="917" class="body">会话 · LLM / Tool 审计 · 调度记录 · 通知渠道</text>
+  <text x="550" y="944" class="small">显式建表脚本 / Explicit schema · ddl-auto: none</text>
+  <path d="M488 914h38" class="flow"/>
+  <path d="M875 797v57" class="flow"/>
+  <rect x="1105" y="854" width="264" height="118" rx="10" fill="#FFFFFF" stroke="#D7D5DE" stroke-dasharray="5 4"/>
+  <text x="1125" y="887" class="name">扩展阶段 / Later</text>
+  <text x="1125" y="917" class="body">多租户 / 分布式 / A2A</text>
+  <text x="1125" y="944" class="small">不属于当前核心阶段</text>
+  <!-- 跨容器连接最后绘制，避免被进程边界的填色遮挡。 -->
+  <path d="M709 183v86" class="flow"/>
+  <path d="M336 461h75" class="flow"/>
+  <text x="48" y="1015" class="body">调用关系示意，非 Maven 依赖；图中业务组件均为目标设计。 / Target design, not module dependencies.</text>
 </svg>

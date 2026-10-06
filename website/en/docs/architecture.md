@@ -6,11 +6,19 @@ outline: deep
 
 # Architecture
 
-OryxOS is a **Spring Boot 3 monolith** running on **JDK 21**. It calls LLMs through **Spring AI Alibaba**, implements its own **ReAct loop** as the Agent core, and ships as a single executable JAR.
+OryxOS targets a **single-node Spring Boot 3 runtime** on **JDK 21**, using **Spring AI / Spring AI Alibaba** for model protocol adaptation and an in-house **ReAct loop**. Boot and CLI currently have separate executable JARs; the final packaging contract remains open.
+
+::: warning Target architecture, not implemented business capabilities
+The repository currently contains the Maven engineering skeleton. The diagram, interfaces, flows, audit and storage on this page are target designs, not runtime evidence. See the [implementation status](https://github.com/hefrankeleyn/oryxos-practice/blob/main/docs/IMPLEMENTATION_STATUS.md) for actual progress.
+:::
 
 > The stack in one line: JDK 21 + Spring Boot 3 + Spring AI Alibaba + home-grown ReAct + SQLite + Picocli.
 
-![OryxOS architecture](/images/architecture.svg)
+![OryxOS target logical architecture](/images/architecture.svg)
+
+[Open the full diagram](/images/architecture.svg)
+
+This is a logical call-flow diagram, not a Maven dependency graph: core defines contracts, capability modules implement them, and boot assembles the modules.
 
 ## Layers
 
@@ -24,7 +32,7 @@ OryxOS is a **Spring Boot 3 monolith** running on **JDK 21**. It calls LLMs thro
 
 In one sentence: **Provider, Memory and Tool feed the ReAct engine, and the engine is exposed through three entries — CLI, Web Service and the scheduler.**
 
-Everything runs in one process. External dependencies — LLM vendor APIs, external MCP servers, enterprise IM — sit outside the application boundary, and every crossing is sandbox-checked and audited.
+The core execution path sits inside one JVM. LLM APIs, external MCP servers and team IM systems sit outside that process. Sandbox checks apply to tool actions by type; LLM and Tool calls both require persisted audit. Cloud-model requests go to the Provider—the tool allow-list is not an isolation boundary for all model traffic.
 
 ## How a message is processed
 

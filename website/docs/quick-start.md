@@ -14,8 +14,9 @@ OryxOS 正处于**阶段一：单机运行时内核**的开发中。本页第一
 
 - **JDK 21+**
 - **Maven 3.9+**
-- 一个 LLM API Key（DeepSeek、Kimi、通义等 OpenAI 兼容协议均可）
 - 操作系统：Linux / macOS
+
+构建和运行当前 CLI 版本入口不需要 LLM API Key。模型配置属于尚未实现的目标运行链路。
 
 ## 一、从源码构建（现在可用）
 
@@ -29,13 +30,14 @@ mvn clean package
 
 | 产物 | 用途 |
 |---|---|
-| `oryxos-boot/target/oryxos.jar` | OryxOS 服务（Spring Boot） |
-| `oryxos-cli/target/oryxos-cli-<version>-exec.jar` | OryxOS 命令行 |
+| `oryxos-boot/target/oryxos.jar` | Spring Boot 工程入口；暂无业务 REST API |
+| `oryxos-cli/target/oryxos-cli-<version>-exec.jar` | CLI 入口；目前只有版本、帮助与无参提示 |
 
 验证命令行可用：
 
 ```bash
 java -jar oryxos-cli/target/oryxos-cli-0.1.0-SNAPSHOT-exec.jar --version
+java -jar oryxos-cli/target/oryxos-cli-0.1.0-SNAPSHOT-exec.jar --help
 ```
 
 ```text
@@ -45,12 +47,22 @@ Java:     21.0.8 (Homebrew)
 系统:     Mac OS X 26.6.2 (aarch64)
 ```
 
-## 二、1.0 目标用法（开发中）
+也可以启动 Boot 工程骨架：
+
+```bash
+java -jar oryxos-boot/target/oryxos.jar
+```
+
+这不提供 Agent 调用、业务 REST 或健康接口；端口监听不代表 Runtime MVP 可用。最终是否合并 CLI 与服务包仍待规格收口。
+
+## 二、目标用法（尚未实现）
+
+以下 `init`、`chat`、`serve` 等命令与接口目前不存在，不要直接照做。示例用于理解设计；最新状态见 [实施状态](https://github.com/hefrankeleyn/oryxos-practice/blob/main/docs/IMPLEMENTATION_STATUS.md)。
 
 ### 1. 初始化工作区
 
 ```bash
-export DEEPSEEK_API_KEY=sk-xxx
+# 目标运行时启动前从环境注入 Provider API Key，不写入 Agent 文件
 
 oryxos init                      # 在当前目录创建 .oryxos/ 工作区（幂等，不覆盖已有文件）
 oryxos profile create weather    # 生成 .oryxos/agents/weather/AGENT.md 模板
@@ -63,7 +75,7 @@ oryxos profile create weather    # 生成 .oryxos/agents/weather/AGENT.md 模板
 ├── agents/            # 每个子目录 = 一个 Agent（AGENT.md + skills/ + scripts/）
 ├── skills/            # 公共 Skill 库（SKILL.md + 附属资源）
 ├── memory/MEMORY.md   # 长期记忆
-├── sessions/          # 会话数据
+├── sessions/          # 目录职责待收口；核心会话持久化目标为 SQLite
 ├── logs/              # 结构化日志
 ├── mcp_servers.yaml   # MCP server 配置
 ├── AGENTS.md          # Bootstrap：项目级行为说明

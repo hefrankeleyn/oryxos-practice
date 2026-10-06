@@ -6,13 +6,21 @@ outline: deep
 
 # What is OryxOS
 
+::: warning Engineering skeleton, not a usable Agent platform
+Nine Maven modules, a Boot entry, a CLI version entry and a bilingual website exist. Provider, ReAct, Memory, Tool, REST and business persistence are not implemented yet. This page describes the product direction and target design. Check the [implementation status](https://github.com/hefrankeleyn/oryxos-practice/blob/main/docs/IMPLEMENTATION_STATUS.md) for actual progress.
+:::
+
 **OryxOS** is an open-source **Agent Harness OS**: an Agent runtime you install on your own Kubernetes cluster, VMs or bare metal. It gives every business Agent (ops, support, knowledge, sales assistants and more) shared model access, a reasoning loop, memory, tool calling, sandboxing and audit.
 
-> One directory defines an Agent; one runtime hosts them all. Self-hosted — your data never leaves.
+> One directory defines an Agent; one runtime provides a shared execution environment. Start with a single-node Runtime MVP, then grow toward an Agent OS.
+
+Self-hosting keeps the workspace and storage on your infrastructure. Cloud-model requests still go to the configured Provider; data egress depends on the actual deployment and access settings.
 
 Teams do two things: **write an Agent directory** (a single `AGENT.md`) and **wire up a few tools**. Where messages come from, how the LLM is called, how context carries over and how audits are recorded — that is OryxOS's job.
 
-![OryxOS architecture](/images/architecture.svg)
+![OryxOS target architecture: unified entry, ReAct, memory, tools and audit](/images/architecture.svg)
+
+[Open the full diagram](/images/architecture.svg)
 
 ## Why OryxOS
 
@@ -21,7 +29,7 @@ Every company has work that belongs to Agents, yet most Agents never leave the d
 | Barrier | Today | The OryxOS way |
 |---|---|---|
 | Defining an Agent takes code | The people who know the business can't do it | One `AGENT.md`, written in natural language |
-| Cloud platforms take your data | Regulated industries can't pass compliance | Self-hosted; data stays on your infrastructure |
+| Data boundaries are hard to control | Storage and model access have unclear boundaries | Self-host storage and explicitly choose cloud or local Providers |
 | Execution is a black box | No audit, no allow-lists — nobody ships it | Mandatory sandbox; every LLM and tool call is audited in the database |
 | Running a fleet is hard | Nobody provides an OS layer for many Agents | One runtime manages the lifecycle and shared services of many Agents |
 
@@ -32,6 +40,8 @@ The deeper point: **what keeps Agents from working reliably in production is rar
 - **Agent runtime**: the execution kernel that runs a single Agent — calling the model, executing tools, managing context, controlling the reasoning loop.
 - **Agent Harness OS**: sits above the runtime and manages a fleet — Agent lifecycles, shared inbound channels and outbound integrations, shared memory, multi-tenancy and governance.
 
+The Agent OS is the long-term direction. The current core stage covers only a single-node runtime, not multi-tenancy, team orchestration or cross-node collaboration.
+
 In operating-system terms, the runtime is a process's execution environment; the Agent Harness OS is the layer that manages many processes, schedules resources and provides shared services. **A runtime runs one Agent; OryxOS runs and manages all of them.**
 
 The north-star formula:
@@ -40,7 +50,7 @@ The north-star formula:
 Natural language (AGENT.md) + Memory + Tools + MCP + Skills + Knowledge + Notify = an Agent
 ```
 
-## Five core capabilities
+## Five core capabilities (development targets)
 
 | Capability | Description |
 |---|---|
@@ -50,16 +60,16 @@ Natural language (AGENT.md) + Memory + Tools + MCP + Skills + Knowledge + Notify
 | **Tools** | Nine built-in tools (files, shell, HTTP, memory, notify); three extension tiers: zero-code Agent directory + MCP, light-code custom MCP server, full-code `@Tool` Bean |
 | **Web Service** | Every capability is exposed over a REST API, so any language can integrate over HTTP |
 
-## Key features
+## Target features
 
 - 🤖 **One directory = one Agent**: any directory with an `AGENT.md` is an Agent — no code, many Agents per instance
-- ☕ **Java-native**: JDK 21 + Spring Boot 3, a single executable JAR that fits your existing Java toolchain
-- 🔒 **Under your control**: runs on your infrastructure, data never leaves, no cloud lock-in
-- 🛡️ **Secure by design**: file, command and network allow-lists on every tool call; secrets via environment variables; end-to-end audit
+- ☕ **Java-native**: JDK 21 + Spring Boot 3, fitting your existing Java toolchain. Boot and CLI currently ship separately; the final packaging contract remains open
+- 🔒 **Under your control**: runs on your infrastructure, with explicit storage and model-access boundaries
+- 🛡️ **Execution boundaries**: file, command and network allow-lists, environment-injected secrets and persisted audit. An allow-list is not strong isolation
 - 🧠 **Home-grown ReAct**: the core loop is implemented in-house, not borrowed from an Agent framework
-- 🔌 **Open standards**: MCP for tools, A2A for collaboration, Agent directories modeled on Anthropic Agent Skills
+- 🔌 **Open standards**: MCP for tools, on-demand Skills; A2A collaboration belongs to a later extension stage
 - ⏰ **Scheduled runs**: Agents can run on a cron schedule and push results to your team IM
-- 🌐 **Stateless and scalable**: stateless instances with externalized state, ready for a distributed future
+- 🌐 **Room to grow**: single-node SQLite and files first; externalized state and distributed operation are later roadmap items
 
 ## Design principles
 

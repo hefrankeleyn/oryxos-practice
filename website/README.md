@@ -28,14 +28,28 @@ website/
     ├── config.mts              # 站点配置：双语、导航、侧边栏、SEO
     ├── integrations.ts         # 评论（Giscus）与统计（51.la）的 ID，留空即关闭
     └── theme/
-        ├── custom.css          # 全局主题（靛蓝→紫品牌色）
+        ├── custom.css          # 全局主题（暖灰 / 深墨 / 淡紫 / 薄荷绿）
         └── components/
-            ├── Home.vue        # 首页（中英双语，t('中文','English')）
+            ├── Home.vue        # 双语首页、场景 Tab 与响应式布局
+            ├── RuntimeScene.vue # 首屏文件 / 运行舱 SVG 插画
             ├── Layout.vue      # 文档页底部挂评论
             └── GiscusComment.vue
 ```
 
 新增文档时：中文放 `docs/`，英文放 `en/docs/`，并在 `config.mts` 两个语言的 `sidebar` 中各加一项。
+
+## 首页设计与维护
+
+首页采用「Agent 的运行场」方向：左侧产品主张，右侧分层运行舱；中段用可切换的 Agent 文件工作台解释业务定义，再展示执行架构与开发阶段。没有在线模型 Demo 或真实任务执行，三个场景均标注为目标配置。
+
+- 配色：云灰 `#F4F5F2`、深墨 `#292536`、运行时紫 `#6650B8`、淡紫 `#E4DFF1`、薄荷绿 `#D2E5DC`、纸白 `#FFFFFF`。
+- 字体：Avenir Next / Trebuchet MS 与系统中文字体；技术配置使用 SFMono / Consolas。不依赖远程字体服务。
+- 场景 Tab 支持点击、左右方向键、Home / End；焦点可见，动效遵循减少动态效果设置。手机端架构图可横向滑动，也可打开原图。
+- 架构图源文件是 `docs/images/architecture.svg`，发布副本是 `website/public/images/architecture.svg`，修改时保持内容一致。
+- 图中调用关系不代表 Maven 编译依赖；业务能力仍以 `docs/IMPLEMENTATION_STATUS.md` 为准。
+- 评论仍在文档页底部；首页不挂评论，51.la 未配置时不加载统计脚本。
+
+视觉改动后运行 `npm run docs:build`，并分别检查中文 / 英文首页的桌面与手机尺寸，尤其是长标题、代码横向滚动、语言菜单与文档页。
 
 ## 发布
 

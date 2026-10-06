@@ -1,15 +1,15 @@
 ---
 layout: home
 markdownStyles: false
-title: OryxOS — 企业级 Agent 操作系统
-description: OryxOS 是 Java 原生的企业级 Agent 操作系统：一个目录定义一个 Agent，一个底座运行一群 Agent，私有部署，数据不出域。
+title: 给 Agent 一个可掌控的运行环境
+description: OryxOS 是 Java 原生的 Agent Harness OS。一个目录定义一个 Agent，一个底座提供共享执行环境；当前处于 Runtime MVP 工程骨架阶段。
 head:
   - - meta
     - property: og:title
-      content: OryxOS — 企业级 Agent 操作系统
+      content: OryxOS — 给 Agent 一个可掌控的运行环境
   - - meta
     - property: og:description
-      content: OryxOS 是 Java 原生的企业级 Agent 操作系统：一个目录定义一个 Agent，一个底座运行一群 Agent，私有部署，数据不出域。
+      content: Java 原生的 Agent Harness OS，文件定义 Agent，共享运行底座。当前处于 Runtime MVP 工程骨架阶段。
   - - meta
     - property: og:url
       content: https://oryxos.hifane.com/

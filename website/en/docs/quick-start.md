@@ -14,8 +14,9 @@ OryxOS is in **phase one: the single-node runtime kernel**. Part one of this pag
 
 - **JDK 21+**
 - **Maven 3.9+**
-- An LLM API key (DeepSeek, Kimi, Qwen or any OpenAI-compatible provider)
 - Linux or macOS
+
+Building the skeleton and running the CLI version entry require no LLM API key. Model configuration belongs to the unimplemented target runtime.
 
 ## Part 1: Build from source (works today)
 
@@ -29,13 +30,14 @@ The build produces two executable JARs:
 
 | Artifact | Purpose |
 |---|---|
-| `oryxos-boot/target/oryxos.jar` | The OryxOS service (Spring Boot) |
-| `oryxos-cli/target/oryxos-cli-<version>-exec.jar` | The OryxOS command line |
+| `oryxos-boot/target/oryxos.jar` | Spring Boot skeleton; no business REST API yet |
+| `oryxos-cli/target/oryxos-cli-<version>-exec.jar` | CLI entry; version, help and no-argument output only |
 
 Check that the CLI works:
 
 ```bash
 java -jar oryxos-cli/target/oryxos-cli-0.1.0-SNAPSHOT-exec.jar --version
+java -jar oryxos-cli/target/oryxos-cli-0.1.0-SNAPSHOT-exec.jar --help
 ```
 
 ```text
@@ -45,12 +47,22 @@ Java:     21.0.8 (Homebrew)
 系统:     Mac OS X 26.6.2 (aarch64)
 ```
 
-## Part 2: Target 1.0 usage (in development)
+You can also start the Boot skeleton:
+
+```bash
+java -jar oryxos-boot/target/oryxos.jar
+```
+
+It provides no Agent invocation, business REST or health endpoints yet. A listening port does not prove a working Runtime MVP. Whether the CLI and service packages will be merged remains an open specification decision.
+
+## Part 2: Target usage (not implemented)
+
+The `init`, `chat`, `serve` commands and APIs below do not exist yet. Do not execute these steps as a working tutorial; they illustrate the design. Check the [implementation status](https://github.com/hefrankeleyn/oryxos-practice/blob/main/docs/IMPLEMENTATION_STATUS.md) for current progress.
 
 ### 1. Initialize a workspace
 
 ```bash
-export DEEPSEEK_API_KEY=sk-xxx
+# Inject the Provider API key from the environment; never put it in the Agent file
 
 oryxos init                      # create the .oryxos/ workspace (idempotent; never overwrites)
 oryxos profile create weather    # scaffold .oryxos/agents/weather/AGENT.md
@@ -63,7 +75,7 @@ Workspace layout:
 ├── agents/            # one sub-directory per Agent (AGENT.md + skills/ + scripts/)
 ├── skills/            # shared Skill library (SKILL.md + resources)
 ├── memory/MEMORY.md   # long-term memory
-├── sessions/          # session data
+├── sessions/          # role remains open; core sessions target SQLite persistence
 ├── logs/              # structured logs
 ├── mcp_servers.yaml   # MCP server configuration
 ├── AGENTS.md          # bootstrap: project-wide behavior

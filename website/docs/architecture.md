@@ -6,11 +6,19 @@ outline: deep
 
 # 系统架构
 
-OryxOS 是一个 **Spring Boot 3 单体应用**，跑在 **JDK 21** 上，基于 **Spring AI Alibaba** 做 LLM 调用，自己实现 **ReAct 循环**作为 Agent 核心，打包成一个可执行 JAR。
+OryxOS 的目标是一个 **Spring Boot 3 单机运行时**，基于 **JDK 21**，通过 **Spring AI / Spring AI Alibaba** 适配模型协议，自实现 **ReAct 循环**。当前 Boot 与 CLI 是两个独立 JAR，最终打包契约仍待收口。
+
+::: warning 目标架构，业务能力尚未实现
+当前仓库是 Maven 工程骨架。下图及本页接口、流程、审计与存储均为目标设计，不是运行证据；真实进度见 [实施状态](https://github.com/hefrankeleyn/oryxos-practice/blob/main/docs/IMPLEMENTATION_STATUS.md)。
+:::
 
 > 技术栈一句话：JDK 21 + Spring Boot 3 + Spring AI Alibaba + 自实现 ReAct + SQLite + Picocli。
 
-![OryxOS 整体架构](/images/architecture.svg)
+![OryxOS 目标逻辑架构](/images/architecture.svg)
+
+[打开完整架构图](/images/architecture.svg)
+
+图中展示逻辑调用关系，不是 Maven 依赖关系：`core` 定义接口，能力模块实现接口，`boot` 聚合模块。
 
 ## 分层视图
 
@@ -24,7 +32,7 @@ OryxOS 是一个 **Spring Boot 3 单体应用**，跑在 **JDK 21** 上，基于
 
 一句话：**Provider、Memory、Tool 三块能力供养 ReAct 引擎，引擎的能力通过 CLI、Web Service、定时任务三个入口对外提供。**
 
-所有能力收敛在一个进程内；外部依赖（LLM 厂商 API、外部 MCP server、企业 IM）都在应用边界之外，并且每一次跨边界调用都经过沙箱校验、写入审计。
+核心执行链路收敛在一个 JVM 进程内；LLM API、外部 MCP server 与企业 IM 位于进程边界之外。工具动作由 Sandbox 按类型校验；LLM 与 Tool 调用都要落库审计。使用云端 LLM 时，请求会发送到 Provider，不应将工具白名单描述成所有模型网络访问的隔离边界。
 
 ## 一次消息的处理流程
 
