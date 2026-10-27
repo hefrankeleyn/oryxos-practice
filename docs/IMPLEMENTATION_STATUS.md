@@ -3,6 +3,8 @@
 > 最后核对：2026-10-03（Asia/Shanghai）
 >
 > 核对范围：当前本地工作树。本文只记录实现与验证状态，不替代需求文档、技术方案或路线图。
+>
+> 2026-10-27 补充核对：Spec Kit Hello 页面、网站发布与作业目录；其他工程状态沿用 2026-10-03 的核对结果。
 
 ## 状态口径
 
@@ -38,12 +40,13 @@ OryxOS 当前完成了 **项目文档、9 模块 Maven 工程骨架、Spring Boo
 | Spring Boot 入口 | 🟡 部分实现 | `OryxOsApplication.main`、工作区目录保障、上下文冒烟测试 | 实际 Service、Controller、数据库表和健康接口 |
 | CLI 入口 | 🟡 部分实现 | 独立 exec JAR 支持 `--version`、`--help` 和无参提示 | 12 个业务命令及其集成 |
 | 项目网站 | ✅ 已实现 | VitePress 中英文首页与 5 类文档页；本地构建通过 | 线上可达性和发布结果需独立验收 |
-| GitHub Pages 工作流 | 🟡 部分实现 | `.github/workflows/deploy-website.yml` 存在 | 本文件不证明最近一次线上部署成功 |
+| GitHub Pages 工作流 | ✅ 已验证 | 2026-10-27 的 `Deploy website` 执行成功（提交 `83a5af0`），线上 `/hello` 实际访问通过 | 后续发布结果仍需逐次核对 |
 | Giscus 评论 | 🟡 部分实现 | 仓库 ID 和 Announcements 分类 ID 已写入 `integrations.ts` | 部署后登录、创建 Discussion、回显评论的真实验收 |
 | 51.la 统计 | ⏸ 未启用 | `id`、`ck` 保持为空，代码会自动关闭 | 用户决定是否开通并提供配置 |
 | Apache 2.0 许可证文件 | ⬜ 未实现 | README 与 POM 已声明 Apache 2.0 | 根目录缺少 `LICENSE` 正文 |
 | Java/网站持续集成 | ⬜ 未实现 | 当前只有网站部署 workflow | 增加 PR/Push 构建测试 workflow |
-| Spec-Kit artifacts | ⬜ 未实现 | 当前没有 `.specify/` | constitution、spec、plan、tasks |
+| Spec-Kit artifacts | ✅ 已建立 | `.specify/memory/constitution.md` 已采纳，`specs/001-add-hello-page/` 已完成规格、规划、任务与实现记录 | 后续 Runtime MVP 功能仍需分别建立规格与验收 |
+| 训练营作业文档 | ✅ 已纳入版本管理 | `docs/homework/` 保存第一、第二周作业及第二周实操记录与截图 | 第二周第二题的上游 PR 尚待提交 |
 
 ## Runtime MVP 核心能力
 
@@ -81,6 +84,16 @@ npm run docs:build
 ```
 
 这些验证只能证明工程骨架、CLI 版本入口、Spring 上下文与网站构建正常，不能证明 Runtime MVP 已实现。
+
+### 2026-10-27：Hello 页面合入与作业目录整理
+
+- 将 `homework/spec-kit-hello-world` 的两个提交快进合入 `main` 并推送，保留原提交历史。
+- `npm run docs:build` 通过，产物包含 `website/.vitepress/dist/hello.html`。
+- 本地浏览器确认 `/hello` 可直接访问、刷新，固定文案正确，返回链接在当前标签到达原中文首页。
+- [Deploy website 工作流](https://github.com/hefrankeleyn/oryxos-practice/actions/runs/40469133260) 成功，浏览器实际打开 [线上 Hello 页面](https://oryxos.hifane.com/hello)，标题、固定说明和返回链接均正确。
+- 课程作业迁入 `docs/homework/`，内部文档与图片引用采用相对路径；截图内容及原有答案保留。
+
+本次未修改 Java 业务源码，也未重新执行 Maven 验证。第二周真实 Agent 运行与飞书修复使用的是另一个官方源码目录，相关证据记录在 `docs/homework/`，不代表当前练习仓库已实现 Runtime MVP。
 
 ## 开发前待收口事项
 
