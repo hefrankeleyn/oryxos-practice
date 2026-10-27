@@ -9,7 +9,7 @@
 | 周次 | 作业文件 | 当前记录 |
 |---|---|---|
 | 第一周 | [第 1 周作业](./01-第1周作业.md) | 认知变化、项目首页、Spec Kit 实践、开源贡献及学习目标 |
-| 第二周 | [第 2 周作业](./02-第2周作业.md) | 第一题已完成；第二题已完成本地修复，PR 待提交 |
+| 第二周 | [第 2 周作业](./02-第2周作业.md) | 第一题已完成；第二题已提交 [PR #1050](https://github.com/oryx-labs/oryxos/pull/1050)，待上游审查 |
 
 ## 二、目录安排
 
@@ -34,6 +34,6 @@ docs/homework/
 | 当前 `oryxos-practice` 仓库 | 第一周网站与 Spec Kit 练习，以及每周作业文档 |
 | 本机 `/Volumes/Work-Data/work/AI/projects/oryxos` | 第二周运行的官方 OryxOS 源码，以及飞书签名密钥修复分支 |
 
-第二周的飞书修复代码仍在官方项目的 `fix/feishu-notify-signing-secret` 分支；本目录保存其学习记录，PR 提交后再补充链接和结果。
+第二周的飞书修复代码位于官方项目的 `fix/feishu-notify-signing-secret` 分支，已推送到个人 Fork 并提交 [PR #1050](https://github.com/oryx-labs/oryxos/pull/1050)；本目录保存学习记录及验证结果，源码没有复制到练习仓库。
 
 2026-10-27，原课程目录 `01-document/07-作业` 的作业、实操记录与截图已整体迁入这里，原有答案保留。

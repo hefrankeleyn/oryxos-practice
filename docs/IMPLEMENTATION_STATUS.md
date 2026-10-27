@@ -46,7 +46,7 @@ OryxOS 当前完成了 **项目文档、9 模块 Maven 工程骨架、Spring Boo
 | Apache 2.0 许可证文件 | ⬜ 未实现 | README 与 POM 已声明 Apache 2.0 | 根目录缺少 `LICENSE` 正文 |
 | Java/网站持续集成 | ⬜ 未实现 | 当前只有网站部署 workflow | 增加 PR/Push 构建测试 workflow |
 | Spec-Kit artifacts | ✅ 已建立 | `.specify/memory/constitution.md` 已采纳，`specs/001-add-hello-page/` 已完成规格、规划、任务与实现记录 | 后续 Runtime MVP 功能仍需分别建立规格与验收 |
-| 训练营作业文档 | ✅ 已纳入版本管理 | `docs/homework/` 保存第一、第二周作业及第二周实操记录与截图 | 第二周第二题的上游 PR 尚待提交 |
+| 训练营作业文档 | ✅ 已纳入版本管理 | `docs/homework/` 保存第一、第二周作业、实操记录与截图；第二周第二题已提交上游 [PR #1050](https://github.com/oryx-labs/oryxos/pull/1050) | 等待上游批准工作流及审查合并 |
 
 ## Runtime MVP 核心能力
 
