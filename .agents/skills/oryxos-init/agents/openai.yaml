@@ -1,0 +1,3 @@
+interface:
+  display_name: "OryxOS 项目初始化"
+  short_description: "增量补齐 OryxOS 日志、监控、HTTP API、Java 规约和安全检查"
