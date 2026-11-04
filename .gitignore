@@ -2,6 +2,10 @@
 
 # Maven
 target/
+*.class
+*.jar
+*.log
+.env*
 
 # IDE
 .idea/

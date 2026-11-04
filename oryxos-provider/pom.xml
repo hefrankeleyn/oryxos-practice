@@ -16,6 +16,10 @@
     <description>核心能力一：LLM Provider 抽象，provider name 到 ChatModel 显式映射</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai</artifactId>
+        </dependency>
         <!-- 核心抽象：OryxTool、Profile、Session 等 -->
         <dependency>
             <groupId>com.oryxlabs</groupId>

@@ -14,6 +14,10 @@
         </encoder>
     </appender>
 
+    <logger name="org.springframework.ai" level="OFF"/>
+    <logger name="org.springframework.web.client" level="OFF"/>
+    <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF"/>
+    <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
     <root level="${oryxos.log.level:-WARN}">
         <appender-ref ref="STDERR"/>
     </root>

@@ -37,6 +37,11 @@ public class OryxOsApplication {
      * @param args 命令行参数，原样透传给 Spring Boot
      */
     public static void main(String[] args) {
+        // 非选项参数按 CLI 命令处理，拼错命令不能意外启动服务；保留既有 Spring 启动选项。
+        if (args.length>0 && (!args[0].startsWith("-") || java.util.Set.of("--help","-h","--version","-V").contains(args[0]))) {
+            System.exit(com.oryxlabs.oryxos.cli.OryxOsCommand.execute(new BootRuntimeStarter(),args));
+            return;
+        }
         Path home = Path.of(System.getProperty(HOME_PROPERTY, DEFAULT_HOME)).toAbsolutePath();
         log.info("OryxOS 启动中，工作区目录: {}", home);
         ensureWorkspace(home);

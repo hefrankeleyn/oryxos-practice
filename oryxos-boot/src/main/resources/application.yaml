@@ -25,3 +25,10 @@ spring:
 
 server:
   port: 8080
+
+# 持久化异常仅由安全边界报告；底层 SQL 异常可能带原始参数，禁止直接透出。
+logging:
+  level:
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: OFF
+    org.hibernate.orm.jdbc.bind: OFF
+    org.springframework.web.client: OFF
