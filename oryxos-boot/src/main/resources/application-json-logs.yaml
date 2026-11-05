@@ -1,0 +1,6 @@
+# 使用 Boot 的 Logstash JSON 编码，MDC 中的 traceId 自动进入结构化日志。
+# CLI 自己的 logging.config 仍保持结果与诊断流分离。
+logging:
+  structured:
+    format:
+      console: logstash

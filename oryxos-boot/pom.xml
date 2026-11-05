@@ -16,6 +16,14 @@
     <description>Spring Boot 启动模块：主类、自动配置、依赖聚合，产出单个可执行 JAR</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
         <!-- 聚合全部功能模块 -->
         <dependency>
             <groupId>com.oryxlabs</groupId>

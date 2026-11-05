@@ -1,6 +1,6 @@
 # OryxOS 实施状态
 
-> 最后核对：2026-10-29（Asia/Shanghai）
+> 最后核对：2026-11-04（Asia/Shanghai）
 >
 > 核对范围：当前本地工作树。本文只记录实现与验证状态，不替代需求文档、技术方案或路线图。
 >
@@ -22,9 +22,14 @@
 OryxOS 已有项目文档、9 模块工程和双语网站，现已增加首个功能的 Provider 显式映射、自实现 ReAct、进程内会话、最小 init/chat 和 SQLite 调用审计。
 本功能的可控测试及本地 JAR 验证通过；真实 DeepSeek 验收尚未执行，不能将本功能或整个 Runtime MVP 标为全部验收完成。
 
-当前生产 Java 源文件共 69 个（排除 `package-info.java`），覆盖 core、provider、memory、tool、channel-cli、storage、cli 和 boot；web 仍为骨架。
-JUnit 报告覆盖 27 个测试类、55 项测试：54 项通过、1 项真实 DeepSeek 验收默认跳过，0 失败、0 错误。
+当前生产 Java 源文件共 78 个（排除 `package-info.java`），覆盖九模块；web 已有公共响应、异常处理、输入校验与请求日志，尚无业务 Controller。
+JUnit 报告覆盖 29 个测试类、63 项测试：62 项通过、1 项真实 DeepSeek 验收默认跳过，0 失败、0 错误。
 测试工具只在测试源码中，正常工具池为空；尚未实现完整九工具、MCP、长期记忆、会话恢复及最终三个 Demo。
+
+003 基础设施的日志、隔离管理端口、MVC/API 公共规范、Google 格式及静态质量检查已完成本地验证。
+用户已确认并采用阿里规约兼容映射与人工清单，不声称运行完整 P3C。
+依赖漏洞扫描因缺少 NVD API key 和可用漏洞数据，按用户选择保留待配置；不能把全套安全检查标为通过。
+使用指引见 [FOUNDATION.md](FOUNDATION.md)，完整证据见 [003 验收记录](../specs/003-project-foundation/quickstart.md)。
 
 ## 工程与交付物
 
@@ -33,15 +38,19 @@ JUnit 报告覆盖 27 个测试类、55 项测试：54 项通过、1 项真实 D
 | 六份项目资料 | ✅ 已实现 | `docs/01` 至 `docs/06` 已存在 | 仍需收口跨文档冲突 |
 | 根目录 Agent 规则 | ✅ 已实现 | `AGENTS.md` 为共用规则，`CLAUDE.md` 为 Claude Code 入口 | 后续随架构决策维护 |
 | 9 模块 Maven 骨架 | ✅ 已实现 | 根 POM 聚合 9 个模块，clean package 通过 | 完整 Runtime MVP 的其余业务能力 |
-| Spring Boot 入口 | 🟡 部分实现 | Boot JAR 分派 init/chat；chat 为 NON_WEB，原无参 MVC 启动保留 | 完整服务模式、业务 REST 与健康接口 |
+| Spring Boot 入口 | 🟡 部分实现 | Boot JAR 分派 init/chat；chat 为 NON_WEB；无参 MVC、虚拟线程及隔离 Actuator 已验证 | 完整服务命令、业务 REST 与产品健康接口 |
 | CLI 入口 | 🟡 部分实现 | 独立 exec 保留版本/帮助/无参提示并支持 init；完整 Boot JAR 提供 chat | 真实 DeepSeek 验收及其余 CLI 命令 |
 | 项目网站 | ✅ 已实现 | VitePress 中英文首页与 5 类文档页；本地构建通过 | 线上可达性和发布结果需独立验收 |
 | GitHub Pages 工作流 | ✅ 已验证 | 2026-10-27 的 `Deploy website` 执行成功（提交 `83a5af0`），线上 `/hello` 实际访问通过 | 后续发布结果仍需逐次核对 |
 | Giscus 评论 | 🟡 部分实现 | 仓库 ID 和 Announcements 分类 ID 已写入 `integrations.ts` | 部署后登录、创建 Discussion、回显评论的真实验收 |
 | 51.la 统计 | ⏸ 未启用 | `id`、`ck` 保持为空，代码会自动关闭 | 用户决定是否开通并提供配置 |
 | Apache 2.0 许可证文件 | ⬜ 未实现 | README 与 POM 已声明 Apache 2.0 | 根目录缺少 `LICENSE` 正文 |
-| Java/网站持续集成 | ⬜ 未实现 | 当前只有网站部署 workflow | 增加 PR/Push 构建测试 workflow |
-| Spec-Kit artifacts | ✅ 已建立 | 宪章已采纳；001 Hello 产物保留，002 Provider/ReAct 已完成规格、规划、任务及可控实现验证 | 002 的 T065 真实验收仍未完成，后续功能分别建立规格 |
+| Java 持续集成 | 🟡 已配置 | 新增 Java quality 与 dependency-audit 作业；本地 verify 通过，原网站发布 workflow 保留 | 远端运行、NVD secret 与分支保护未验证 |
+| 日志、监控与 API 基础设施 | ✅ 已实现 | JSON/可读日志、MDC、回环管理端口、统一 API 组件与本地文档；测试及真实 JAR 验证通过 | 业务 REST 端点及执行期限另行实现 |
+| 格式与静态代码检查 | ✅ 已实现 | Google 格式、Checkstyle、PMD、SpotBugs/FindSecBugs、Gitleaks；负向样例有效，暂存 hook 已激活 | 自动检查不替代完整人工安全审查 |
+| 阿里规约兼容映射 | ✅ 已接入选定范围 | 用户确认的 PMD 7/Checkstyle 部分映射、覆盖缺口和人工清单；九模块规则检查通过 | 不是完整 P3C；未自动覆盖的条款仍需按清单人工审查 |
+| 依赖漏洞检查 | 🟡 待配置 | Dependency-Check profile 与 CI 已配置并保留失败行为 | 按用户选择暂缓，待 NVD key/漏洞库就绪后完成真实扫描 |
+| Spec-Kit artifacts | ✅ 已建立 | 宪章与 001/002 产物保留；003 初始化规格、计划、任务及验证记录已建立 | 002 的 T065 及 003 的 T016 未完成 |
 | 训练营作业文档 | ✅ 已纳入版本管理 | `docs/homework/` 保存第一、第二周作业、实操记录与截图；第二周第二题已提交上游 [PR #1050](https://github.com/oryx-labs/oryxos/pull/1050) | 等待上游批准工作流及审查合并 |
 
 ## Runtime MVP 核心能力
@@ -52,7 +61,7 @@ JUnit 报告覆盖 27 个测试类、55 项测试：54 项通过、1 项真实 D
 | US-2 ReAct | 🟡 部分实现 | ReActLoop、PromptBuilder、ToolExecutor、AgentService；顺序工具回填、去重和上限可控测试通过 | 真实 DeepSeek 工具闭环及最终核心 Demo |
 | US-3 Memory | 🟡 部分实现 | MemoryService 门面与内存 SessionManager；完整轮投影、隔离及原始历史保留通过 | MarkdownMemoryStore、长期记忆功能与跨重启恢复 |
 | US-4 Tool / MCP / Sandbox | 🟡 部分实现 | 统一注册/参数校验/执行适配、WhitelistSandbox、工具审计；隔离纯计算与拒绝测试通过 | 九个产品工具、MCP stdio 及完整 Demo；不承诺强隔离 |
-| US-5 REST API | ⬜ 未实现 | `oryxos-web` 只有 POM 和 `package-info.java` | 10 个核心端点、统一响应/异常、超时与输入限制测试通过 |
+| US-5 REST API | 🟡 基础设施已实现 | 统一响应/异常、32KiB UTF-8 校验组件、MDC 与受控 OpenAPI；尚无生产业务 Controller | 10 个核心端点、产品健康接口、同步执行期限及真实调用验收 |
 | SQLite 业务持久化 | 🟡 部分实现 | llm_calls/tool_invocations 显式 DDL、JPA 与独立 begin/complete 提交；成功/失败/拒绝及提交不确定验证通过 | Session、调度、通知等其余业务表；不支持会话恢复 |
 | CLI Channel | 🟡 部分实现 | stdin/stdout 多轮接入，统一 AgentService；Boot JAR 回环目标与持久审计验证通过 | 真实 Provider 联合验收；其他渠道不在本功能 |
 | 12 个 CLI 命令 | 🟡 部分实现 | 最小 init/chat 已实现，旧版本/帮助入口保留；轻量 exec 的 chat 无 Runtime 时明确失败 | 其余命令及全量集成 |
@@ -61,6 +70,18 @@ JUnit 报告覆盖 27 个测试类、55 项测试：54 项通过、1 项真实 D
 | 三个验收 Demo | ⬜ 未实现 | 仅有需求和技术方案描述 | 每日天气、每日科技日报、每日 GitHub 日报分别保留可重复运行证据 |
 
 ## 最近一次本地验证
+
+### 2026-11-04：基础设施初始化
+
+- 用户原有全部 Git 可见改动已保存为 main 上的 `d969be1`、`bfcca5f`；开始时即位于 main，无需额外合并。2026-11-05 按用户要求将基础设施初始化纳入后续 main 本地提交，保留 NVD 扫描待办；未推送或部署。
+- `./mvnw -o -B -ntp clean package` 与最终 `./mvnw -o -B -ntp verify` 通过；63 项测试中 62 项通过、1 项真实 DeepSeek 默认跳过。
+- 九模块 PMD 无违规/分析错误；SpotBugs/FindSecBugs 实际扫描 104 个生产 class，无未处理违规/分析错误。已审查例外逐项限定类、方法或字段并记录理由。
+- 121 个 Java 文件重复格式化再校验，文件哈希保持不变；110 个原有 Java 文件的格式迁移另有隔离生成的审查 patch。当前源码敏感信息扫描及格式/PMD/FindSecBugs/Gitleaks 负向样例通过。
+- 实际 Boot JAR 在临时 SQLite 与回环端口验证管理入口、探针、Prometheus、统一 404、JSON 日志和文档开关；Swagger WebJar 及编码路径绕过被阻断。进程与临时目录已清理。
+- 两种 JAR 的版本/帮助/init，以及现有 chat/审计可控测试通过；项目测试类未进入发布 JAR。没有运行真实付费 Provider 或三个最终 Demo。
+- `.githooks/pre-commit` 已在本仓库本地激活；暂存快照检查不会改写工作树或索引。Java CI 文件已加入，未运行远端 CI、修改分支保护或部署。
+- 用户随后确认采用 PMD 7 + Checkstyle 兼容规则映射，已补齐 [覆盖说明与人工清单](../config/quality/alibaba-mapping.md)，并收紧包名小写与空 catch 检查；`./mvnw -o -B -ntp compile pmd:check` 九模块通过。本轮未改变 Java 业务源码，原构建/JAR 验收证据继续适用。
+- 联网依赖扫描实际失败于 NVD 空凭证和无漏洞数据，用户选择保留待配置；没有报告可证明依赖安全。完整命令、范围、报告与产物哈希见 [003 验收记录](../specs/003-project-foundation/quickstart.md)。
 
 ### 2026-10-29：首个 Provider/ReAct 功能
 
@@ -125,7 +146,7 @@ P0 规格收口与工程保障
   → 三个端到端 Demo
 ```
 
-本功能已落实其范围内的规格、打包和 Spec-Kit 产物；`LICENSE`、CI、完整 CLI/服务及其余核心能力仍按后续任务推进，不以本功能验证结果代替。
+首个功能的规格、打包和 Spec-Kit 产物已落实，003 已补充本地基础设施和 Java CI 配置；`LICENSE`、远端 CI 验证、完整 CLI/服务及其余核心能力仍按后续任务推进，不以本地验证结果代替。
 
 ## 更新规则
 

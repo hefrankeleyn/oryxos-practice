@@ -1,0 +1,9 @@
+# 本地查看文档时绑定回环；不改变普通配置下现有服务监听行为。
+server:
+  address: 127.0.0.1
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

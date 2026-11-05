@@ -11,10 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(properties = "spring.datasource.url=jdbc:sqlite::memory:")
 class OryxOsApplicationTests {
 
-    /**
-     * 上下文加载成功即通过。
-     */
-    @Test
-    void contextLoads() {
-    }
+  /** 上下文加载成功即通过。 */
+  @Test
+  void contextLoads() {}
 }

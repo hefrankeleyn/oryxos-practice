@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- MemoryService 是显式共享的有状态服务，不能为消除表示暴露警告而复制服务实例。
+         仅排除三个构造器中 memory 字段的依赖注入；新增字段/方法仍扫描。 -->
+    <Match>
+        <Class name="~com\.oryxlabs\.oryxos\.core\.(agent\.AgentService|runtime\.PromptBuilder|runtime\.ReActLoop)"/>
+        <Method name="&lt;init&gt;"/>
+        <Field name="memory"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- process 仅记录本地随机 UUID 与 RuntimeFailure.Code 枚举，均不包含外部文本。
+         后续日志参数改变时必须重新审查；不排除其他类的日志注入检查。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.core.agent.AgentService"/>
+        <Method name="process"/>
+        <Bug pattern="CRLF_INJECTION_LOGS"/>
+    </Match>
+    <!-- 统一工具接口须容纳第三方工具的受检异常；ToolExecutor 负责审计并映射安全错误。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.core.tool.OryxTool"/>
+        <Method name="execute"/>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+    </Match>
+    <!-- 外部 ChatModel 响应仍作防御校验；不因 SDK 非空标注而删掉协议边界。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.provider.SpringAiProviderService"/>
+        <Method name="call"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    </Match>
+    <!-- CLI 和 Runtime 必须共享同一个 Session 来维护会话历史。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.channel.cli.CliChannel"/>
+        <Method name="&lt;init&gt;"/>
+        <Field name="session"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- java.net.URI.getHost 只返回合法 ASCII 主机；非 ASCII 原文返回 null 并被拒绝。
+         此处仅处理 DNS 不区分大小写，未执行 Unicode 兼容正规化；已有全角主机拒绝测试。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.tool.WhitelistSandbox"/>
+        <Method name="enforce"/>
+        <Bug pattern="IMPROPER_UNICODE"/>
+    </Match>
+    <!-- 非业务路径必须原样抛回框架，不能窄化/包装通用异常而改变第三方端点错误协议。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.web.GlobalExceptionHandler"/>
+        <Method name="~handleBoundary|handleUnexpected"/>
+        <Bug pattern="THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION"/>
+    </Match>
+    <!-- DDL 唯一来源为随 JAR 发布的固定 /db/schema/audit-schema.sql；不拼接用户输入。
+         后续如增加可配置脚本或动态 DDL，必须删除此排除并重新审查。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.storage.AuditSchemaInitializer"/>
+        <Method name="initialize"/>
+        <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+    </Match>
+    <!-- EntityManagerFactory 由 Spring 管理并共享；AuditStore 不拥有工厂生命周期。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.storage.JpaAuditStore"/>
+        <Method name="&lt;init&gt;"/>
+        <Field name="factory"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- 装配失败先关闭上下文，再把原异常交给同方法外层的安全错误映射；不透出原始异常。 -->
+    <Match>
+        <Class name="com.oryxlabs.oryxos.BootRuntimeStarter"/>
+        <Method name="start"/>
+        <Bug pattern="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION"/>
+    </Match>
+</FindBugsFilter>
